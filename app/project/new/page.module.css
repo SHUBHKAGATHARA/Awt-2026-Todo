@@ -1,0 +1,103 @@
+.container {
+    min-height: 100vh;
+}
+
+.header {
+    padding: 1.5rem 3rem;
+    background: transparent;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: all var(--transition-base);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    background: white;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+}
+
+.backLink:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary-light);
+    transform: translateX(-4px);
+    box-shadow: var(--shadow-mint);
+}
+
+.main {
+    padding: 2rem 3rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+}
+
+.formContainer {
+    width: 100%;
+    max-width: 700px;
+    animation: slideUp 0.6s ease-out;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0 0 0.75rem 0;
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-secondary) 50%, var(--color-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+}
+
+.description {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    margin: 0 0 2.5rem 0;
+    line-height: 1.6;
+}
+
+.formCard {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+    animation: scaleIn 0.5s ease-out;
+}
+
+.formCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 1.5rem;
+    }
+
+    .main {
+        padding: 1.5rem;
+    }
+
+    .formCard {
+        padding: 1.5rem;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+}
