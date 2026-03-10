@@ -6,7 +6,6 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { MoreVertical, Plus, Edit2, Trash2 } from 'lucide-react';
 import TaskCard from './TaskCard';
 import type { TaskList, Task } from '@/types';
 import styles from './TaskListColumn.module.css';
@@ -52,20 +51,18 @@ export default function TaskListColumn({
                         onClick={() => setShowMenu(!showMenu)}
                         aria-label="List options"
                     >
-                        <MoreVertical size={18} />
+                        Options
                     </button>
 
                     {showMenu && (
                         <div className={styles.menu}>
                             <button className={styles.menuItem} onClick={() => { onEdit(); setShowMenu(false); }}>
-                                <Edit2 size={16} />
                                 Edit List
                             </button>
                             <button
                                 className={`${styles.menuItem} ${styles.danger}`}
                                 onClick={() => { onDelete(); setShowMenu(false); }}
                             >
-                                <Trash2 size={16} />
                                 Delete List
                             </button>
                         </div>
@@ -88,7 +85,6 @@ export default function TaskListColumn({
             </div>
 
             <button className={styles.addTaskButton} onClick={onAddTask}>
-                <Plus size={18} />
                 Add Task
             </button>
         </div>

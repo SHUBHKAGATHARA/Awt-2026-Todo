@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSession, signOut } from 'next-auth/react';
+import GlobalSearch from './GlobalSearch';
 import styles from './TopBar.module.css';
 
 export default function TopBar() {
-    const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const { data: session, status } = useSession();
     const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -47,25 +47,10 @@ export default function TopBar() {
     return (
         <header className={styles.topBar}>
             <div className={styles.searchContainer}>
-                <span className={styles.searchIcon}>🔍</span>
-                <input
-                    type="text"
-                    placeholder="Search projects, tasks, or users..."
-                    className={styles.searchInput}
-                    onFocus={() => setIsSearchFocused(true)}
-                    onBlur={() => setIsSearchFocused(false)}
-                />
+                <GlobalSearch />
             </div>
 
             <div className={styles.actions}>
-                <button className={styles.iconBtn} aria-label="Notifications">
-                    🔔
-                    <span className={styles.notificationBadge}></span>
-                </button>
-                <button className={styles.iconBtn} aria-label="Settings">
-                    ⚙️
-                </button>
-
                 {status === 'authenticated' && session?.user && (
                     <div className={styles.profileWrapper} ref={profileMenuRef}>
                         <button
@@ -78,23 +63,21 @@ export default function TopBar() {
                                 <p className={styles.profileRole}>{primaryRole}</p>
                             </div>
                         </button>
-                        
+
                         {showProfileMenu && (
                             <div className={styles.profileMenu}>
                                 <div className={styles.menuItem}>
-                                    <span className={styles.menuIcon}>👤</span>
                                     <div>
                                         <p className={styles.menuTitle}>{displayName}</p>
                                         <p className={styles.menuSubtitle}>{session.user.email}</p>
                                     </div>
                                 </div>
                                 <div className={styles.menuDivider}></div>
-                                <button 
+                                <button
                                     className={styles.menuButton}
                                     onClick={handleSignOut}
                                     onMouseDown={(e) => e.preventDefault()}
                                 >
-                                    <span className={styles.menuIcon}>🚪</span>
                                     <span>Sign Out</span>
                                 </button>
                             </div>

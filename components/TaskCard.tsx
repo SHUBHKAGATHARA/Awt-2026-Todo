@@ -3,7 +3,6 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Calendar, MessageSquare, User, MoreVertical, Edit2, Trash2, CheckCircle2, Circle } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Task } from '@/types';
 import styles from './TaskCard.module.css';
@@ -67,11 +66,7 @@ export default function TaskCard({ task, isDragging, onEdit, onDelete, onComplet
                         aria-label={isCompleted ? 'Mark as incomplete' : 'Mark as complete'}
                         title={isCompleted ? 'Mark as incomplete' : 'Mark as complete'}
                     >
-                        {isCompleted ? (
-                            <CheckCircle2 size={20} className={styles.completedIcon} />
-                        ) : (
-                            <Circle size={20} className={styles.incompleteIcon} />
-                        )}
+                        <span className={styles.completeLabel}>{isCompleted ? 'Completed' : 'Mark done'}</span>
                     </button>
                     <div
                         className={styles.priorityIndicator}
@@ -90,11 +85,22 @@ export default function TaskCard({ task, isDragging, onEdit, onDelete, onComplet
                             }}
                             aria-label="Task options"
                         >
-                            <MoreVertical size={16} />
+                            Options
                         </button>
 
                         {showMenu && (
                             <div className={styles.menu} onClick={(e) => e.stopPropagation()}>
+                                <button
+                                    className={`${styles.menuItem} ${!isCompleted ? styles.success : ''}`}
+                                    onClick={() => {
+                                        if (onComplete) {
+                                            onComplete(!isCompleted);
+                                        }
+                                        setShowMenu(false);
+                                    }}
+                                >
+                                    {isCompleted ? 'Mark as Incomplete' : 'Mark as Complete'}
+                                </button>
                                 <button
                                     className={styles.menuItem}
                                     onClick={() => {
@@ -102,7 +108,6 @@ export default function TaskCard({ task, isDragging, onEdit, onDelete, onComplet
                                         setShowMenu(false);
                                     }}
                                 >
-                                    <Edit2 size={14} />
                                     Edit Task
                                 </button>
                                 <button
@@ -112,7 +117,6 @@ export default function TaskCard({ task, isDragging, onEdit, onDelete, onComplet
                                         setShowMenu(false);
                                     }}
                                 >
-                                    <Trash2 size={14} />
                                     Delete Task
                                 </button>
                             </div>
@@ -131,29 +135,25 @@ export default function TaskCard({ task, isDragging, onEdit, onDelete, onComplet
                 <div className={styles.metadata}>
                     {isCompleted && task.completedAt && (
                         <div className={`${styles.metaItem} ${styles.completedBadge}`}>
-                            <CheckCircle2 size={14} />
                             <span>Completed {format(new Date(task.completedAt), 'MMM d')}</span>
                         </div>
                     )}
-                    
+
                     {!isCompleted && task.dueDate && (
                         <div className={styles.metaItem}>
-                            <Calendar size={14} />
-                            <span>{format(new Date(task.dueDate), 'MMM d')}</span>
+                            <span>Due {format(new Date(task.dueDate), 'MMM d')}</span>
                         </div>
                     )}
 
                     {task.assignedUser && (
                         <div className={styles.metaItem}>
-                            <User size={14} />
-                            <span>{task.assignedUser.username}</span>
+                            <span>Assignee {task.assignedUser.username}</span>
                         </div>
                     )}
 
                     {commentCount > 0 && (
                         <div className={styles.metaItem}>
-                            <MessageSquare size={14} />
-                            <span>{commentCount}</span>
+                            <span>Comments {commentCount}</span>
                         </div>
                     )}
                 </div>

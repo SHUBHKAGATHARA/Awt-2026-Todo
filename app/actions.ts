@@ -40,6 +40,7 @@ import {
     getTaskHistory,
 } from '@/lib/db';
 import { getCurrentUser } from '@/lib/session';
+import { hashPassword } from '@/lib/auth';
 import type {
     CreateProjectInput,
     UpdateProjectInput,
@@ -52,10 +53,36 @@ import type {
 } from '@/types';
 import { revalidatePath } from 'next/cache';
 
+type GuardResult = { user: Awaited<ReturnType<typeof getCurrentUser>> } | { error: string };
+
+function hasAllowedRole(userRoles: string[] = [], allowed: string[]) {
+    return allowed.some((role) => userRoles.includes(role));
+}
+
+async function requireUser(allowedRoles?: string[]): Promise<GuardResult> {
+    const user = await getCurrentUser();
+    if (!user) {
+        return { error: 'Unauthorized' };
+    }
+
+    if (allowedRoles && !hasAllowedRole(user.roles || [], allowedRoles)) {
+        return { error: 'Forbidden' };
+    }
+
+    return { user };
+}
+
+function guardFailure(error: string): ApiResponse<any> {
+    return { success: false, error };
+}
+
 // ============= PROJECTS =============
 
 export async function getProjectsAction(): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const projects = await getAllProjects();
         return { success: true, data: projects };
     } catch (error: any) {
@@ -79,12 +106,10 @@ export async function createProjectAction(
     data: CreateProjectInput
 ): Promise<ApiResponse<any>> {
     try {
-        const user = await getCurrentUser();
-        if (!user) {
-            return { success: false, error: 'Unauthorized' };
-        }
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
 
-        const project = await createProject({ ...data, createdBy: user.id });
+        const project = await createProject({ ...data, createdBy: guard.user.id });
         revalidatePath('/');
         return { success: true, data: project, message: 'Project created successfully' };
     } catch (error: any) {
@@ -97,6 +122,9 @@ export async function updateProjectAction(
     data: UpdateProjectInput
 ): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const project = await updateProject(id, data);
         revalidatePath('/');
         revalidatePath(`/project/${id}`);
@@ -108,6 +136,9 @@ export async function updateProjectAction(
 
 export async function deleteProjectAction(id: number): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         await deleteProject(id);
         revalidatePath('/');
         return { success: true, message: 'Project deleted successfully' };
@@ -120,6 +151,9 @@ export async function deleteProjectAction(id: number): Promise<ApiResponse<any>>
 
 export async function getTaskListsAction(projectId: number): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const taskLists = await getTaskListsByProjectId(projectId);
         return { success: true, data: taskLists };
     } catch (error: any) {
@@ -131,6 +165,9 @@ export async function createTaskListAction(
     data: CreateTaskListInput
 ): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const taskList = await createTaskList(data);
         revalidatePath(`/project/${data.projectId}`);
         return { success: true, data: taskList, message: 'List created successfully' };
@@ -145,6 +182,9 @@ export async function updateTaskListAction(
     data: UpdateTaskListInput
 ): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const taskList = await updateTaskList(id, data);
         revalidatePath(`/project/${projectId}`);
         return { success: true, data: taskList, message: 'List updated successfully' };
@@ -158,6 +198,9 @@ export async function deleteTaskListAction(
     projectId: number
 ): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         await deleteTaskList(id);
         revalidatePath(`/project/${projectId}`);
         return { success: true, message: 'List deleted successfully' };
@@ -170,6 +213,9 @@ export async function deleteTaskListAction(
 
 export async function getTasksAction(listId: number): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const tasks = await getTasksByListId(listId);
         return { success: true, data: tasks };
     } catch (error: any) {
@@ -179,6 +225,9 @@ export async function getTasksAction(listId: number): Promise<ApiResponse<any>> 
 
 export async function getTaskAction(id: number): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const task = await getTaskById(id);
         if (!task) {
             return { success: false, error: 'Task not found' };
@@ -194,12 +243,10 @@ export async function createTaskAction(
     projectId: number
 ): Promise<ApiResponse<any>> {
     try {
-        const user = await getCurrentUser();
-        if (!user) {
-            return { success: false, error: 'Unauthorized' };
-        }
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
 
-        const task = await createTask(data, user.id);
+        const task = await createTask(data, guard.user.id);
         revalidatePath(`/project/${projectId}`);
         return { success: true, data: task, message: 'Task created successfully' };
     } catch (error: any) {
@@ -213,12 +260,10 @@ export async function updateTaskAction(
     data: UpdateTaskInput
 ): Promise<ApiResponse<any>> {
     try {
-        const user = await getCurrentUser();
-        if (!user) {
-            return { success: false, error: 'Unauthorized' };
-        }
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
 
-        const task = await updateTask(id, data, user.id);
+        const task = await updateTask(id, data, guard.user.id);
         revalidatePath(`/project/${projectId}`);
         return { success: true, data: task, message: 'Task updated successfully' };
     } catch (error: any) {
@@ -231,12 +276,10 @@ export async function deleteTaskAction(
     projectId: number
 ): Promise<ApiResponse<any>> {
     try {
-        const user = await getCurrentUser();
-        if (!user) {
-            return { success: false, error: 'Unauthorized' };
-        }
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
 
-        await deleteTask(id, user.id);
+        await deleteTask(id, guard.user.id);
         revalidatePath(`/project/${projectId}`);
         return { success: true, message: 'Task deleted successfully' };
     } catch (error: any) {
@@ -251,12 +294,10 @@ export async function moveTaskAction(
     projectId: number
 ): Promise<ApiResponse<any>> {
     try {
-        const user = await getCurrentUser();
-        if (!user) {
-            return { success: false, error: 'Unauthorized' };
-        }
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
 
-        const task = await moveTask(taskId, newListId, newPosition, user.id);
+        const task = await moveTask(taskId, newListId, newPosition, guard.user.id);
         revalidatePath(`/project/${projectId}`);
         return { success: true, data: task, message: 'Task moved successfully' };
     } catch (error: any) {
@@ -268,6 +309,9 @@ export async function moveTaskAction(
 
 export async function getAllCommentsAction(): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const comments = await getAllComments();
         return { success: true, data: comments };
     } catch (error: any) {
@@ -277,6 +321,9 @@ export async function getAllCommentsAction(): Promise<ApiResponse<any>> {
 
 export async function getCommentsAction(taskId: number): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const comments = await getCommentsByTaskId(taskId);
         return { success: true, data: comments };
     } catch (error: any) {
@@ -289,12 +336,10 @@ export async function createCommentAction(
     projectId: number
 ): Promise<ApiResponse<any>> {
     try {
-        const user = await getCurrentUser();
-        if (!user) {
-            return { success: false, error: 'Unauthorized' };
-        }
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
 
-        const comment = await createComment({ ...data, userId: user.id });
+        const comment = await createComment({ ...data, userId: guard.user.id });
         revalidatePath(`/project/${projectId}`);
         return { success: true, data: comment, message: 'Comment added successfully' };
     } catch (error: any) {
@@ -307,6 +352,9 @@ export async function deleteCommentAction(
     projectId: number
 ): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager', 'Developer']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         await deleteComment(id);
         revalidatePath(`/project/${projectId}`);
         return { success: true, message: 'Comment deleted successfully' };
@@ -317,6 +365,9 @@ export async function deleteCommentAction(
 
 export async function deleteCommentGlobalAction(id: number): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         await deleteComment(id);
         return { success: true, message: 'Comment deleted successfully' };
     } catch (error: any) {
@@ -328,6 +379,9 @@ export async function deleteCommentGlobalAction(id: number): Promise<ApiResponse
 
 export async function getUsersAction(): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const users = await getAllUsers();
         return { success: true, data: users };
     } catch (error: any) {
@@ -337,6 +391,13 @@ export async function getUsersAction(): Promise<ApiResponse<any>> {
 
 export async function getUserAction(id: number): Promise<ApiResponse<any>> {
     try {
+        if (!id || Number.isNaN(id)) {
+            return { success: false, error: 'Invalid user id' };
+        }
+
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const user = await getUserById(id);
         if (!user) {
             return { success: false, error: 'User not found' };
@@ -351,7 +412,11 @@ export async function createUserAction(
     data: { username: string; email: string; password: string }
 ): Promise<ApiResponse<any>> {
     try {
-        const user = await createUser(data);
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
+        const hashedPassword = await hashPassword(data.password);
+        const user = await createUser({ ...data, password: hashedPassword });
         return { success: true, data: user, message: 'User created successfully' };
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -363,7 +428,15 @@ export async function updateUserAction(
     data: { username?: string; email?: string; password?: string }
 ): Promise<ApiResponse<any>> {
     try {
-        const user = await updateUser(id, data);
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
+        const payload = { ...data };
+        if (data.password) {
+            payload.password = await hashPassword(data.password);
+        }
+
+        const user = await updateUser(id, payload);
         return { success: true, data: user, message: 'User updated successfully' };
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -372,6 +445,9 @@ export async function updateUserAction(
 
 export async function deleteUserAction(id: number): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         await deleteUser(id);
         return { success: true, message: 'User deleted successfully' };
     } catch (error: any) {
@@ -383,6 +459,9 @@ export async function deleteUserAction(id: number): Promise<ApiResponse<any>> {
 
 export async function getRolesAction(): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const roles = await getAllRoles();
         return { success: true, data: roles };
     } catch (error: any) {
@@ -392,6 +471,9 @@ export async function getRolesAction(): Promise<ApiResponse<any>> {
 
 export async function getRoleAction(id: number): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const role = await getRoleById(id);
         if (!role) {
             return { success: false, error: 'Role not found' };
@@ -406,6 +488,9 @@ export async function createRoleAction(
     data: { roleName: string; description?: string }
 ): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const role = await createRole(data);
         return { success: true, data: role, message: 'Role created successfully' };
     } catch (error: any) {
@@ -418,6 +503,9 @@ export async function updateRoleAction(
     data: { roleName?: string; description?: string }
 ): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const role = await updateRole(id, data);
         return { success: true, data: role, message: 'Role updated successfully' };
     } catch (error: any) {
@@ -427,6 +515,9 @@ export async function updateRoleAction(
 
 export async function deleteRoleAction(id: number): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         await deleteRole(id);
         return { success: true, message: 'Role deleted successfully' };
     } catch (error: any) {
@@ -438,6 +529,9 @@ export async function deleteRoleAction(id: number): Promise<ApiResponse<any>> {
 
 export async function getUserRolesAction(): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const userRoles = await getAllUserRoles();
         return { success: true, data: userRoles };
     } catch (error: any) {
@@ -447,6 +541,9 @@ export async function getUserRolesAction(): Promise<ApiResponse<any>> {
 
 export async function getUserRoleAction(id: number): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const userRole = await getUserRoleById(id);
         if (!userRole) {
             return { success: false, error: 'User role not found' };
@@ -461,6 +558,9 @@ export async function createUserRoleAction(
     data: { userId: number; roleId: number }
 ): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         const userRole = await createUserRole(data);
         return { success: true, data: userRole, message: 'User role assigned successfully' };
     } catch (error: any) {
@@ -470,6 +570,9 @@ export async function createUserRoleAction(
 
 export async function deleteUserRoleAction(id: number): Promise<ApiResponse<any>> {
     try {
+        const guard = await requireUser(['Admin', 'Manager']);
+        if ('error' in guard) return guardFailure(guard.error);
+
         await deleteUserRole(id);
         return { success: true, message: 'User role removed successfully' };
     } catch (error: any) {

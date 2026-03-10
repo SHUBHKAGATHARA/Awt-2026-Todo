@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
-import { CheckCircle2 } from 'lucide-react';
 import styles from './ActivityFeed.module.css';
 import type { Task } from '@/types';
 
@@ -19,6 +18,12 @@ export default function ActivityFeed({ completedTasks }: ActivityFeedProps) {
         }
     };
 
+    const getAvatarLabel = (task: Task) => {
+        if (task.assignedUser?.username) return task.assignedUser.username.slice(0, 1).toUpperCase();
+        if (task.title) return task.title.slice(0, 1).toUpperCase();
+        return 'T';
+    };
+
     return (
         <div className={styles.feedContainer}>
             <div className={styles.header}>
@@ -31,7 +36,6 @@ export default function ActivityFeed({ completedTasks }: ActivityFeedProps) {
             <div className={styles.list}>
                 {completedTasks.length === 0 ? (
                     <div className={styles.emptyState}>
-                        <CheckCircle2 size={48} style={{ opacity: 0.3 }} />
                         <p>No completed tasks yet</p>
                     </div>
                 ) : (
@@ -42,7 +46,7 @@ export default function ActivityFeed({ completedTasks }: ActivityFeedProps) {
                                     className={styles.avatar}
                                     style={{ backgroundColor: `${getPriorityColor(task.priority)}20` }}
                                 >
-                                    ✅
+                                    {getAvatarLabel(task)}
                                 </div>
                             </div>
                             <div className={styles.content}>

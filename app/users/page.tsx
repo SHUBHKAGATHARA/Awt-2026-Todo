@@ -5,10 +5,22 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getUsersAction, deleteUserAction } from '@/app/actions';
 import toast from 'react-hot-toast';
+import { useConfirm } from '@/components/useConfirm';
 import styles from './page.module.css';
+
+function getInitials(name: string) {
+  return name
+    .split(/[\s._-]/)
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
 
 export default function UsersPage() {
   const router = useRouter();
+  const { confirm, ConfirmModal } = useConfirm();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,9 +36,15 @@ export default function UsersPage() {
     setLoading(false);
   }
 
-  async function handleDelete(id: number) {
-    if (!confirm('Are you sure you want to delete this user?')) return;
-    
+  async function handleDelete(id: number, username: string) {
+    const ok = await confirm({
+      title: 'Delete User',
+      message: `Are you sure you want to delete "${username}"? This action cannot be undone.`,
+      confirmLabel: 'Delete User',
+      variant: 'danger',
+    });
+    if (!ok) return;
+
     const result = await deleteUserAction(id);
     if (result.success) {
       toast.success('User deleted successfully');
@@ -38,8 +56,10 @@ export default function UsersPage() {
 
   if (loading) return <div className={styles.container}>Loading...</div>;
 
+
   return (
     <div className={styles.container}>
+      {ConfirmModal}
       <div className={styles.header}>
         <div>
           <h1>Users</h1>
@@ -72,7 +92,12 @@ export default function UsersPage() {
               users.map((user: any) => (
                 <tr key={user.id}>
                   <td>{user.id}</td>
-                  <td>{user.username}</td>
+                  <td>
+                    <div className={styles.userCell}>
+                      <span className={styles.userAvatar}>{getInitials(user.username)}</span>
+                      <span className={styles.userName}>{user.username}</span>
+                    </div>
+                  </td>
                   <td>{user.email}</td>
                   <td>{new Date(user.createdAt).toLocaleDateString()}</td>
                   <td>
@@ -81,7 +106,7 @@ export default function UsersPage() {
                         Edit
                       </Link>
                       <button
-                        onClick={() => handleDelete(user.id)}
+                        onClick={() => handleDelete(user.id, user.username)}
                         className={styles.deleteBtn}
                       >
                         Delete

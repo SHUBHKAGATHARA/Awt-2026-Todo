@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Edit2, Trash2, Plus, MoreVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useConfirm } from '@/components/useConfirm';
 import KanbanBoard from '@/components/KanbanBoard';
 import Modal from '@/components/Modal';
 import ProjectForm from '@/components/ProjectForm';
@@ -49,6 +50,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
     const [editTaskModal, setEditTaskModal] = useState<Task | null>(null);
 
     const [projectId, setProjectId] = useState<number | null>(null);
+    const { confirm, ConfirmModal } = useConfirm();
 
     useEffect(() => {
         params.then((p) => {
@@ -103,9 +105,13 @@ export default function ProjectPage({ params }: ProjectPageProps) {
     const handleDeleteProject = async () => {
         if (!projectId) return;
 
-        if (!confirm('Are you sure you want to delete this project? This will delete all lists and tasks.')) {
-            return;
-        }
+        const ok = await confirm({
+            title: 'Delete Project',
+            message: `Delete "${project?.name}"? All task lists and tasks inside will be permanently removed.`,
+            confirmLabel: 'Delete Project',
+            variant: 'danger',
+        });
+        if (!ok) return;
 
         const response = await deleteProjectAction(projectId);
 
@@ -145,12 +151,16 @@ export default function ProjectPage({ params }: ProjectPageProps) {
         }
     };
 
-    const handleDeleteList = async (listId: number) => {
+    const handleDeleteList = async (listId: number, listName?: string) => {
         if (!projectId) return;
 
-        if (!confirm('Are you sure you want to delete this list? This will delete all tasks in it.')) {
-            return;
-        }
+        const ok = await confirm({
+            title: 'Delete List',
+            message: `Delete list "${listName || 'this list'}"? All tasks inside will be permanently removed.`,
+            confirmLabel: 'Delete List',
+            variant: 'danger',
+        });
+        if (!ok) return;
 
         const response = await deleteTaskListAction(listId, projectId);
 
@@ -192,12 +202,16 @@ export default function ProjectPage({ params }: ProjectPageProps) {
         }
     };
 
-    const handleDeleteTask = async (taskId: number) => {
+    const handleDeleteTask = async (taskId: number, taskTitle?: string) => {
         if (!projectId) return;
 
-        if (!confirm('Are you sure you want to delete this task?')) {
-            return;
-        }
+        const ok = await confirm({
+            title: 'Delete Task',
+            message: `Delete "${taskTitle || 'this task'}"? This action cannot be undone.`,
+            confirmLabel: 'Delete Task',
+            variant: 'danger',
+        });
+        if (!ok) return;
 
         const response = await deleteTaskAction(taskId, projectId);
 
@@ -251,6 +265,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
 
     return (
         <div className={styles.container}>
+            {ConfirmModal}
             <header className={styles.header}>
                 <div className={styles.headerLeft}>
                     <Link href="/" className={styles.backLink}>

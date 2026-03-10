@@ -1,93 +1,102 @@
+/* ===================================================
+   USERS PAGE — ULTRA PREMIUM
+   =================================================== */
+
 .container {
-  padding: 2.5rem 2rem;
+  padding: 2.5rem 2.5rem 3rem;
   max-width: 1400px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeIn 0.5s ease-out;
 }
 
+/* ========== PAGE HEADER ========== */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--color-border-light);
-  animation: slideDown 0.5s ease-out;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--color-border);
+  animation: slideInDown 0.5s ease-out;
+  gap: 1rem;
 }
 
 .header h1 {
   font-size: 2.25rem;
   font-weight: 800;
-  margin: 0 0 0.5rem 0;
-  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-secondary) 50%, var(--color-accent) 100%);
+  margin: 0 0 0.375rem 0;
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .header p {
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 500;
 }
 
+/* ========== CREATE BUTTON ========== */
 .createBtn {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  color: white;
-  padding: 0.875rem 1.75rem;
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  font-weight: 600;
-  transition: all var(--transition-base);
   display: inline-flex;
   align-items: center;
-  gap: 0.625rem;
-  box-shadow: var(--shadow-mint);
+  gap: 0.5rem;
+  background: var(--gradient-primary);
+  color: white;
+  padding: 0.8rem 1.75rem;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-primary);
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .createBtn::before {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .createBtn:hover::before {
-  width: 300px;
-  height: 300px;
+  left: 100%;
 }
 
 .createBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.35);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.42);
 }
 
+/* ========== TABLE CONTAINER ========== */
 .tableContainer {
   background: var(--color-bg-card);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   border: 1px solid var(--color-border);
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  animation: slideUp 0.5s ease-out;
+  box-shadow: var(--shadow-card);
+  animation: slideInUp 0.5s ease-out;
+  transition: all var(--transition-base);
 }
 
 .tableContainer:hover {
-  box-shadow: var(--shadow-md);
-  border-color: rgba(16, 185, 129, 0.3);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(37, 99, 235, 0.15);
 }
 
+/* ========== TABLE ========== */
 .table {
   width: 100%;
   border-collapse: separate;
@@ -95,26 +104,27 @@
 }
 
 .table thead {
-  background: linear-gradient(135deg, #f8fafc 0%, #f0fdf4 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
 }
 
 .table th {
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.5rem;
   text-align: left;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text-secondary);
   text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
   border-bottom: 1px solid var(--color-border);
 }
 
 .table td {
-  padding: 1.25rem 1.5rem;
+  padding: 1.125rem 1.5rem;
   color: var(--color-text-primary);
   border-bottom: 1px solid var(--color-border-light);
   font-size: 0.9375rem;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-fast);
+  font-weight: 500;
 }
 
 .table tr:last-child td {
@@ -122,37 +132,70 @@
 }
 
 .table tbody tr {
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .table tbody tr:hover {
-  background: var(--color-bg-mint);
+  background: var(--color-bg-hover);
 }
 
 .table tbody tr:hover td {
   color: var(--color-primary-dark);
 }
 
+/* ========== USER AVATAR ========== */
+.userAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  margin-right: 0.625rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  letter-spacing: -0.02em;
+  vertical-align: middle;
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.userName {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* ========== EMPTY STATE ========== */
 .emptyState {
   text-align: center;
   padding: 4rem !important;
   color: var(--color-text-muted);
   font-style: italic;
-  font-size: 1.125rem;
+  font-size: 1rem;
 }
 
+/* ========== ACTION BUTTONS ========== */
 .actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 .editBtn,
 .deleteBtn {
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
+  padding: 0.4rem 0.875rem;
+  border-radius: var(--radius-sm);
   font-size: 0.8125rem;
   font-weight: 600;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
   border: 1px solid transparent;
   cursor: pointer;
   display: inline-flex;
@@ -161,54 +204,63 @@
 }
 
 .editBtn {
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(37, 99, 235, 0.08);
   color: var(--color-primary);
   text-decoration: none;
+  border-color: rgba(37, 99, 235, 0.15);
 }
 
 .editBtn:hover {
   background: var(--color-primary);
   color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .deleteBtn {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.08);
   color: var(--color-error);
+  border-color: rgba(239, 68, 68, 0.15);
 }
 
 .deleteBtn:hover {
   background: var(--color-error);
   color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-/* Form Styles for sub-pages sharing this module */
+/* ========== FORM STYLES (shared by new/edit sub-pages) ========== */
 .formHeader {
   margin-bottom: 2.5rem;
 }
 
 .formHeader h1 {
   font-size: 2rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
 }
 
 .formHeader p {
   color: var(--color-text-muted);
   margin: 0;
+  font-size: 0.9375rem;
 }
 
 .form {
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: 2.5rem;
   max-width: 700px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
   animation: scaleIn 0.4s ease-out;
 }
 
@@ -220,20 +272,21 @@
   display: block;
   color: var(--color-text-primary);
   font-weight: 600;
-  margin-bottom: 0.75rem;
-  font-size: 0.9375rem;
+  margin-bottom: 0.625rem;
+  font-size: 0.9rem;
 }
 
 .formGroup input,
 .formGroup textarea,
 .formGroup select {
   width: 100%;
-  padding: 0.875rem 1rem;
-  background: var(--color-bg-card);
-  border: 2px solid var(--color-border);
+  padding: 0.8rem 1rem;
+  background: var(--color-bg-primary);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
   font-size: 0.9375rem;
+  font-family: inherit;
   transition: all var(--transition-base);
 }
 
@@ -242,18 +295,19 @@
 .formGroup select:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  background: var(--color-bg-card);
 }
 
 .formGroup textarea {
   resize: vertical;
   min-height: 120px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 .formActions {
   display: flex;
-  gap: 1rem;
+  gap: 0.875rem;
   justify-content: flex-end;
   margin-top: 2.5rem;
   padding-top: 1.5rem;
@@ -262,36 +316,37 @@
 
 .cancelBtn,
 .submitBtn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.625rem;
   border-radius: var(--radius-md);
   font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
   font-size: 0.9375rem;
+  font-family: inherit;
 }
 
 .cancelBtn {
   background: transparent;
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   color: var(--color-text-secondary);
 }
 
 .cancelBtn:hover {
-  background: var(--color-bg-tertiary);
-  border-color: var(--color-primary-light);
+  background: var(--color-bg-secondary);
+  border-color: rgba(37, 99, 235, 0.3);
   color: var(--color-primary);
 }
 
 .submitBtn {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background: var(--gradient-primary);
   color: white;
-  box-shadow: var(--shadow-mint);
+  box-shadow: var(--shadow-primary);
 }
 
 .submitBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.4);
 }
 
 .submitBtn:disabled,
@@ -299,4 +354,25 @@
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tableContainer {
+    overflow-x: auto;
+  }
+
+  .form {
+    padding: 1.5rem;
+  }
 }

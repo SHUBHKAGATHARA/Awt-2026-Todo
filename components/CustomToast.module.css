@@ -1,0 +1,230 @@
+/* ===================================================
+   CUSTOM TOAST NOTIFICATIONS — ULTRA PREMIUM
+   =================================================== */
+
+/* ── Container the Toaster renders into ── */
+.toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 1rem 1.125rem 1rem 1rem;
+    background: #ffffff;
+    border-radius: 14px;
+    min-width: 300px;
+    max-width: 400px;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.07),
+        0 10px 32px -4px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(0, 0, 0, 0.04);
+    font-family: 'Inter', sans-serif;
+    cursor: default;
+    border-left: 3.5px solid transparent;
+    transition: box-shadow 0.2s ease;
+}
+
+.toast:hover {
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.09),
+        0 14px 38px -4px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+/* ── type variants — left border colour ── */
+.success {
+    border-left-color: #2563EB;
+}
+
+.error {
+    border-left-color: #ef4444;
+}
+
+.loading {
+    border-left-color: #f59e0b;
+}
+
+.custom {
+    border-left-color: #8b5cf6;
+}
+
+/* ── Icon wrapper ── */
+.iconWrap {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    margin-top: 1px;
+}
+
+.successIcon {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    color: #2563EB;
+}
+
+.errorIcon {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    color: #ef4444;
+}
+
+.loadingIcon {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    color: #f59e0b;
+}
+
+.customIcon {
+    background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+    color: #8b5cf6;
+}
+
+/* ── Spinner for loading ── */
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid #fde68a;
+    border-top-color: #f59e0b;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── Text body ── */
+.body {
+    flex: 1;
+    min-width: 0;
+}
+
+.type {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.2rem;
+}
+
+.successType {
+    color: #2563EB;
+}
+
+.errorType {
+    color: #ef4444;
+}
+
+.loadingType {
+    color: #f59e0b;
+}
+
+.customType {
+    color: #8b5cf6;
+}
+
+.message {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+/* ── Dismiss button ── */
+.dismiss {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    transition: all 0.15s ease;
+    margin-top: 2px;
+    font-size: 0.875rem;
+}
+
+.dismiss:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* ── Progress bar (drains over duration) ── */
+.progressBar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2.5px;
+    border-radius: 0 0 14px 14px;
+    transform-origin: left;
+    animation: drainBar linear forwards;
+}
+
+.successBar {
+    background: linear-gradient(90deg, #2563EB, #60a5fa);
+}
+
+.errorBar {
+    background: linear-gradient(90deg, #ef4444, #fca5a5);
+}
+
+.loadingBar {
+    background: linear-gradient(90deg, #f59e0b, #fde68a);
+}
+
+.customBar {
+    background: linear-gradient(90deg, #8b5cf6, #c4b5fd);
+}
+
+@keyframes drainBar {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
+
+/* ── Entrance / exit animations ── */
+.toastEnter {
+    animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.toastExit {
+    animation: toastOut 0.25s ease-in forwards;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(60px) scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(60px) scale(0.92);
+    }
+}

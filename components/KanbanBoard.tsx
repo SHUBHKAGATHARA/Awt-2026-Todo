@@ -18,7 +18,6 @@ import {
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Plus } from 'lucide-react';
 import TaskListColumn from './TaskListColumn';
 import TaskCard from './TaskCard';
 import Button from './Button';
@@ -145,7 +144,6 @@ export default function KanbanBoard({
                             onClick={onAddList}
                             className={styles.addListButton}
                         >
-                            <Plus size={20} />
                             Add List
                         </Button>
                     </div>
